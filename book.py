@@ -16,7 +16,12 @@ class Book(object):
         self.bids = []
         self.asks = []
 
+        self.arbs = []
+
         self.populate()
+
+    def symbol(self):
+        return '{0}/{1}'.format(self.base.upper(), self.term.upper())
 
     def populate(self):
         self.exchanges = [
@@ -29,26 +34,44 @@ class Book(object):
 
         for e in self.exchanges:
             if e.bid != None:
-                self.bids.append([e.bid, e.depth, e.code, e.stamp])
+                self.bids.append([e.bid, e.depth, e.name, e.stamp])
             if e.ask != None:
-                self.asks.append([e.ask, e.depth, e.code, e.stamp])
+                self.asks.append([e.ask, e.depth, e.name, e.stamp])
 
         self.bids = sorted(self.bids, reverse=True)
         self.asks = sorted(self.asks)
 
-    def arbs(self):
-        arbs = []
+    def eval_arbs(self, min_arb_pct=0.001):
+        self.arbs = []
+        self.min_arb_pct = min_arb_pct
+
+        # Compare asks to bids to check for arb opportunities
         for a in self.asks:
-            l = len(arbs)
+            l = len(self.arbs)
             for b in self.bids:
-                if a[0] - b[0] < 0: arbs.append((a, b))
-                else:               break
+                arb_pct = (b[0] - a[0]) / a[0]
+                if arb_pct >= self.min_arb_pct: 
+                    self.arbs.append((a, b, arb_pct))
+                # As bids and asks are sorted, no need to look further down the stack if there is no match
+                else: break
 
-            if len(arbs) == l: break
+            # See previous comment
+            if len(self.arbs) == l: break
 
-        if arbs == []: return None
+    def what_arbs(self):
+        if self.arbs == None: return 'No arbs evaluated yet!'
+        elif self.arbs == []: return 'No arbs available!'
 
-        return arbs
+        return [
+            'Buy {0} @ {1} on {2} and sell @ {3} on {4} for a gross return of {5}% (Timestamps: {6} and {7})'.format(
+                self.symbol(), ask, ask_ex, bid, bid_ex,
+                100 * round(pct, 1), str(ask_ts), str(bid_ts)
+            ) 
+            for (ask, _, ask_ex, ask_ts), (bid, _, bid_ex, bid_ts), pct
+            in self.arbs
+        ]
+
+
 
     # def add(self, ex):
     #     if any(ex.code in sub for sub in self.bids):

@@ -10,7 +10,7 @@ HUOBI_URL = 'https://api.huobi.pro/market/depth'
 class Huobi(Exchange):
     """docstring for Huobi"""
     def __init__(self, base, term, depth=2):
-        super(Huobi, self).__init__(base, term, 'HUO', depth)
+        super(Huobi, self).__init__(base, term, 'HUO', 'Huobi', depth)
 
     def symbol(self):
         return '{0}{1}'.format(self.base.lower(), self.term.lower())

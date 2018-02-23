@@ -10,7 +10,7 @@ TIDEX_URL = 'https://api.tidex.com/api/3/depth/'
 class Tidex(Exchange):
     """docstring for Tidex"""
     def __init__(self, base, term, depth=2):
-        super(Tidex, self).__init__(base, term, 'TDX', depth)
+        super(Tidex, self).__init__(base, term, 'TDX', 'Tidex', depth)
 
     def symbol(self):
         return '{0}_{1}'.format(self.base.lower(), self.term.lower())

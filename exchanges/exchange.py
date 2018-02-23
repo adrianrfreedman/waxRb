@@ -3,7 +3,7 @@ from pprint import pformat
 
 class Exchange(object):
     """docstring for Exchange"""
-    def __init__(self, base, term, code, depth=2):
+    def __init__(self, base, term, code, name, depth=2):
         self.base   = base
         self.term   = term
         self.depth  = float(depth)
@@ -14,6 +14,7 @@ class Exchange(object):
 
         self.stamp  = None
         self.code   = code
+        self.name   = name
 
         self.update()
 

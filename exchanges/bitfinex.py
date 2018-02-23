@@ -10,7 +10,7 @@ BITFINEX_URL = 'https://api.bitfinex.com/v2/book/'
 class Bitfinex(Exchange):
     """docstring for Bitfinex"""
     def __init__(self, base, term, depth=2):
-        super(Bitfinex, self).__init__(base, term, 'BFX', depth)
+        super(Bitfinex, self).__init__(base, term, 'BFX', 'Bitfinex', depth)
 
     def symbol(self):
         return '{0}{1}'.format(self.base.upper(), self.term.upper())
@@ -23,8 +23,7 @@ class Bitfinex(Exchange):
         # print 'Response received!'
         
         if not resp.ok:
-            print 'Error in request', resp.status_code
-            print resp.json()
+            print 'Error in {0} request: {1}'.format(self.__class__.__name__, resp.status_code)
             return
 
         resp = resp.json()

@@ -10,7 +10,7 @@ BITTREX_URL = 'https://bittrex.com/api/v1.1/public/getmarketsummary?market='
 class Bittrex(Exchange):
     """docstring for Bittrex"""
     def __init__(self, base, term, depth=2):
-        super(Bittrex, self).__init__(base, term, 'BRX', depth)
+        super(Bittrex, self).__init__(base, term, 'BRX', 'Bittrex', depth)
 
     def symbol(self):
         return '{1}-{0}'.format(self.base.lower(), self.term.lower())
@@ -23,13 +23,18 @@ class Bittrex(Exchange):
         # print 'Response received!'
         
         if not resp.ok:
-            # print 'Error in request', r.status_code
+            print 'Error in {0} request: {1}'.format(self.__class__.__name__, resp.status_code)
             return
 
         book = resp.json()
 
         if not book['success']:
-            # print 'Error:', book.get('error')
+            msg = book['message']
+            print '{0} error:'.format(self.__class__.__name__),
+            if msg == 'INVALID_MARKET':
+                print '{0} not available'.format(symbol)
+            else:
+                print '{0}'.format(msg)
             return
 
         self.bid = book['result'][0]['Bid']

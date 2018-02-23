@@ -39,6 +39,7 @@ TOKENS = {
     'WAXBNT':   '5a37ebb3a88c2a00013bbd66',
     'DRGNBNT':  '5a3cb9eec4c2b60001f748a0',
     'WINGS':    '5a1ea498171b0100018277b0',
+    'EOS':      '5a1eb21531b0890001c2b90a',
 }
 BANCOR_URL = 'https://api.bancor.network/0.1/currencies/{0}/ticker?fromCurrencyId={1}'
 
@@ -46,7 +47,7 @@ BANCOR_URL = 'https://api.bancor.network/0.1/currencies/{0}/ticker?fromCurrencyI
 class Bancor(Exchange):
     """docstring for Bancor"""
     def __init__(self, base, term):
-        super(Bancor, self).__init__(base, term, 'BNT')
+        super(Bancor, self).__init__(base, term, 'BNT', 'Bancor')
 
     def update(self):
         symbol = self.symbol()
@@ -56,14 +57,18 @@ class Bancor(Exchange):
         # print 'Response received!'
         
         if not resp.ok:
-            print 'Error in request', r.status_code
+            print 'Error in {0} request: {1}'.format(self.__class__.__name__, r.status_code)
             return
 
         book = resp.json()
 
-        error = 'errorCode'
-        if error in book:
-            print 'Error:', book[error]
+        if 'errorCode' in book:
+            error = book['errorCode']
+            print '{0} error:'.format(self.__class__.__name__)
+            if error == 'invalidObjectId':
+                print '{0} not available'.format(symbol)
+            else:
+                print '{0}'.format(error)
             return
 
         self.bid    = book['data'][u'price']

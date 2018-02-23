@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from book import Book
+from emails import arb_signals
 from pprint import pprint
 import sys
 
@@ -8,18 +9,10 @@ import sys
 def main(base, term, depth):
     book = Book(base, term, depth)
 
-    pprint (book.bids)
-    pprint (book.asks)
-    print
-    # book.bids[0][0] = .000101
-    print 'arb opportunities'
-    pprint (book.arbs())
-    return
-    # Check if arb exists between each exchange
-    for i, e in enumerate(exchanges):
-        print e
-        # if i == len(exchanges): continue
-        # for x in exchanges[i+1:]:
+    book.eval_arbs()
+    if book.arbs:
+        pprint(book.what_arbs());return
+        arb_signals.email(book.what_arbs())
 
 
 
